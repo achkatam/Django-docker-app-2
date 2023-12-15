@@ -1,4 +1,4 @@
-FROM python:3.11.5
+FROM python:3.7.3-stretch
 
 ENV PYTHONUNBUFFERED 1
 
@@ -12,5 +12,4 @@ COPY . .
 
 EXPOSE 8000
 
-# run this django.sh file
 ENTRYPOINT ["/app/django.sh"]

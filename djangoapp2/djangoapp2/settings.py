@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-z_zyx0q5#9klowd6o@m@(pm#dq=s7+1_-i6u@!@$!!peru54k-'
+SECRET_KEY = 'django-insecure-mhvqloog1lhayy(h^b_48o4$qsse!mk5m^u(3(pm@+vh%tx4$b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -79,11 +79,11 @@ WSGI_APPLICATION = 'djangoapp2.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DB_DRIVER', 'django.db.backends.postgresql'),
-        'NAME': os.environ.get('PG_DB', 'postgres'),
-        'USER': os.environ.get('PG_USER', 'postgres'),
-        'PASSWORD': os.environ.get('PG_PASSWORD', 'postgres'),
+        'NAME': os.environ.get('PG_DB', 'postgresql'),
+        'USER': os.environ.get('PG_USER', 'postgresql'),
+        'PASSWORD': os.environ.get('PG_PASSWORD', 'postgresql'),
         'HOST': os.environ.get('PG_HOST', 'localhost'),
-        'PORT': os.environ.get('PG_PORT', '5432')
+        'PORT': os.environ.get('PG_PORT', '5432'),
     }
 }
 
