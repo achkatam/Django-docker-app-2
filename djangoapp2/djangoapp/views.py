@@ -28,7 +28,7 @@ def get_user(request, pk):
     try:
         users = User.objects.get(id=pk)
         serializer = UserSerializer(users, many=False)
-        return Response(serializer.data)
+        return Response({"status": "success", "user": serializer.data}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': f'User not found'},
                         status=status.HTTP_404_NOT_FOUND)
@@ -74,8 +74,7 @@ def update_user(request, pk):
     try:
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data,
-                        status=status.HTTP_200_OK)
+        return Response({'status': 'success', 'user': serializer.data}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f'Invalid data provided. Details: {str(e)}'},
                         status=status.HTTP_400_BAD_REQUEST)
