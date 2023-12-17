@@ -31,7 +31,7 @@ services:
     restart: always
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@example.com
-      - PGADMIN_DEFAULT_PASSWORD=setYourOwnPass
+      - PGADMIN_DEFAULT_PASSWORD=setYourPassword
       - PGADMIN_LISTEN_PORT=5050
     ports:
       - "5050:5050"
