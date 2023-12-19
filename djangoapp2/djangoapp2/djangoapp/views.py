@@ -1,56 +1,89 @@
-from rest_framework.decorators import api_view
+from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from .models import User
 from .serializers import UserSerializer
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 
 
 # Create your views here.
-# In this case I do not need views. I will use it for my controllers
 
-# GET methods - get the data from json Postman body, serializes it and prints
-# serializes the instance with many arg=T/F
+# get all users
 @api_view(['GET'])
 def get_users(request):
-    users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
+    try:
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({'error': f'An error occurred. Details: {str(e)}'},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# get single user
 @api_view(['GET'])
 def get_user(request, pk):
-    user = User.objects.get(id=pk)
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
+    try:
+        user = User.objects.get(id=pk)
+        serializer = UserSerializer(user, many=False)
+        return Response(serializer.data, status=200)
+    except ObjectDoesNotExist:
+        return Response({'error': 'User not found'},
+                        status=status.HTTP_404_NOT_FOUND)
 
 
-# POST method - create user with give data from json body - Postman or similar
-# Uses only the serializer if it's valid
+# add user
 @api_view(['POST'])
-def create_user(request):
-    serializer = UserSerializer(data=request.data)
+def add_user(request):
+    try:
+        # Check if a user with the same name and email already exists
+        existing_user = User.objects.filter(
+            email=request.data.get('email')
+        ).first()
 
-    if serializer.is_valid():
-        serializer.save()
+        if existing_user:
+            return Response({'error': 'User with the same email already exists'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-    return Response(serializer.data)
+        # If no existing user, proceed with creating a new user
+        serializer = UserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': 'Invalid data provided'},
+                            status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': f'An error occurred. Details: {str(e)}'},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['PUT'])
-# PUT method - gets already created instance and updates it if is valid
+# update user
+@api_view(["PUT"])
 def update_user(request, pk):
-    user = User.objects.get(id=pk)
+    try:
+        user = User.objects.get(id=pk)
+    except ObjectDoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
     serializer = UserSerializer(instance=user, data=request.data)
 
-    if serializer.is_valid():
+    try:
+        serializer.is_valid(raise_exception=True)
         serializer.save()
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": f'Invalid data provided. Details: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response(serializer.data)
 
-
-@api_view(['DELETE'])
-# DELETE method - if user is existing delete it
+# delete user
+@api_view(["DELETE"])
 def delete_user(request, pk):
-    user = User.objects.get(id=pk)
-    user.delete()
-
-    return Response('Deleted successfully!')
+    try:
+        user = User.objects.get(id=pk)
+        user.delete()
+        return Response("User successfully deleted!")
+    except Exception as e:
+        return Response({"error": f"User with id: {pk} doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
